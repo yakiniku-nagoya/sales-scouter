@@ -6,62 +6,69 @@ interface ScoreGaugeProps {
 
 export default function ScoreGauge({ score }: ScoreGaugeProps) {
   const getScoreColor = () => {
-    if (score >= 70) return { main: '#22c55e', glow: 'rgba(34, 197, 94, 0.4)' };
-    if (score >= 40) return { main: '#f59e0b', glow: 'rgba(245, 158, 11, 0.4)' };
-    return { main: '#ef4444', glow: 'rgba(239, 68, 68, 0.4)' };
+    if (score >= 70) return { main: '#4ade80', glow: 'rgba(74, 222, 128, 0.35)' };
+    if (score >= 40) return { main: '#fbbf24', glow: 'rgba(251, 191, 36, 0.35)' };
+    return { main: '#f87171', glow: 'rgba(248, 113, 113, 0.35)' };
   };
 
   const colors = getScoreColor();
-  const circumference = 2 * Math.PI * 58;
+  const circumference = 2 * Math.PI * 56;
   const strokeDashoffset = circumference - (score / 100) * circumference * 0.75;
 
   return (
-    <div className="flex flex-col items-center py-6">
-      <div className="relative w-48 h-48">
-        {/* Glow effect */}
+    <div className="flex flex-col items-center py-4">
+      <div className="relative w-44 h-44">
+        {/* Outer glow */}
         <div
-          className="absolute inset-4 rounded-full blur-2xl transition-all duration-700"
+          className="absolute inset-2 rounded-full blur-2xl opacity-60 transition-all duration-700"
           style={{ background: colors.glow }}
         />
 
-        {/* Background ring */}
-        <svg className="w-full h-full -rotate-[135deg]" viewBox="0 0 128 128">
-          {/* Track */}
+        {/* SVG Gauge */}
+        <svg className="w-full h-full -rotate-[135deg]" viewBox="0 0 120 120">
+          {/* Background track */}
           <circle
-            cx="64"
-            cy="64"
-            r="58"
+            cx="60"
+            cy="60"
+            r="56"
             fill="none"
-            stroke="rgba(255,255,255,0.06)"
-            strokeWidth="6"
+            stroke="rgba(255,255,255,0.04)"
+            strokeWidth="4"
             strokeLinecap="round"
             strokeDasharray={circumference * 0.75}
           />
-          {/* Progress */}
+          {/* Gradient definition */}
+          <defs>
+            <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor={colors.main} stopOpacity="0.6" />
+              <stop offset="100%" stopColor={colors.main} />
+            </linearGradient>
+          </defs>
+          {/* Progress arc */}
           <circle
-            cx="64"
-            cy="64"
-            r="58"
+            cx="60"
+            cy="60"
+            r="56"
             fill="none"
-            stroke={colors.main}
-            strokeWidth="6"
+            stroke="url(#scoreGradient)"
+            strokeWidth="4"
             strokeLinecap="round"
             strokeDasharray={circumference * 0.75}
             strokeDashoffset={strokeDashoffset}
             className="transition-all duration-700 ease-out"
-            style={{ filter: `drop-shadow(0 0 8px ${colors.glow})` }}
+            style={{ filter: `drop-shadow(0 0 6px ${colors.glow})` }}
           />
         </svg>
 
         {/* Center content */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span
-            className="text-6xl font-light tracking-tighter transition-colors duration-500"
+            className="text-5xl font-extralight tracking-tighter transition-colors duration-500"
             style={{ color: colors.main }}
           >
             {score}
           </span>
-          <span className="text-xs text-white/40 uppercase tracking-widest mt-1">Score</span>
+          <span className="text-[10px] text-white/30 uppercase tracking-[0.2em] mt-1">Instant Score</span>
         </div>
       </div>
     </div>

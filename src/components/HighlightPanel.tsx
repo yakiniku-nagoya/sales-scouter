@@ -16,21 +16,21 @@ export default function HighlightPanel({ highlights }: HighlightPanelProps) {
     switch (type) {
       case 'positive':
         return {
-          dot: 'bg-[#22c55e]',
-          tag: 'bg-[#22c55e]/10 text-[#22c55e] ring-[#22c55e]/20',
-          glow: 'hover:shadow-[inset_0_0_20px_rgba(34,197,94,0.1)]',
+          dot: 'bg-[#4ade80]',
+          tag: 'bg-[#4ade80]/10 text-[#4ade80] border-[#4ade80]/20',
+          hover: 'hover:border-[#4ade80]/20',
         };
       case 'opportunity':
         return {
-          dot: 'bg-[#f59e0b]',
-          tag: 'bg-[#f59e0b]/10 text-[#f59e0b] ring-[#f59e0b]/20',
-          glow: 'hover:shadow-[inset_0_0_20px_rgba(245,158,11,0.1)]',
+          dot: 'bg-[#fbbf24]',
+          tag: 'bg-[#fbbf24]/10 text-[#fbbf24] border-[#fbbf24]/20',
+          hover: 'hover:border-[#fbbf24]/20',
         };
       case 'warning':
         return {
-          dot: 'bg-[#ef4444]',
-          tag: 'bg-[#ef4444]/10 text-[#ef4444] ring-[#ef4444]/20',
-          glow: 'hover:shadow-[inset_0_0_20px_rgba(239,68,68,0.1)]',
+          dot: 'bg-[#f87171]',
+          tag: 'bg-[#f87171]/10 text-[#f87171] border-[#f87171]/20',
+          hover: 'hover:border-[#f87171]/20',
         };
     }
   };
@@ -38,29 +38,28 @@ export default function HighlightPanel({ highlights }: HighlightPanelProps) {
   return (
     <div className="glass rounded-2xl p-5">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-sm font-medium text-white/60">検出ポイント</h3>
-        <span className="text-xs text-white/30 bg-white/5 px-2.5 py-1 rounded-full ring-1 ring-white/10">
-          {highlights.length}
+        <h3 className="text-sm font-medium text-white/50">検出ポイント</h3>
+        <span className="text-[10px] text-white/25 bg-white/[0.03] px-2.5 py-1 rounded-full border border-white/[0.04]">
+          {highlights.length}件
         </span>
       </div>
 
-      <div className="space-y-2 max-h-[260px] overflow-y-auto pr-1">
+      <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
         {highlights.map((highlight, i) => {
           const styles = getTypeStyles(highlight.type);
           return (
             <div
               key={i}
-              className={`p-3.5 rounded-xl bg-white/[0.02] hover:bg-white/[0.04]
-                ring-1 ring-white/5 cursor-pointer transition-all duration-300 ${styles.glow}`}
+              className={`p-3 rounded-xl bg-white/[0.01] border border-white/[0.03] cursor-pointer transition-all duration-200 ${styles.hover} hover:bg-white/[0.02]`}
             >
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center gap-2 mb-1.5">
                 <span className={`w-1.5 h-1.5 rounded-full ${styles.dot}`} />
-                <span className="text-[11px] text-white/30 font-mono">{highlight.time}</span>
-                <span className={`text-[10px] px-2 py-0.5 rounded-full ring-1 ${styles.tag}`}>
+                <span className="text-[10px] text-white/25 font-mono">{highlight.time}</span>
+                <span className={`text-[9px] px-2 py-0.5 rounded-full border ${styles.tag}`}>
                   {highlight.tag}
                 </span>
               </div>
-              <p className="text-sm text-white/70 leading-relaxed">「{highlight.text}」</p>
+              <p className="text-[13px] text-white/60 leading-relaxed">「{highlight.text}」</p>
             </div>
           );
         })}

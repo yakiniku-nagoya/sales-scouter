@@ -10,7 +10,6 @@ interface ECGTimelineProps {
 export default function ECGTimeline({ score, threshold = 70 }: ECGTimelineProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [dataPoints, setDataPoints] = useState<number[]>(() => {
-    // Initialize with some random data
     const initial: number[] = [];
     for (let i = 0; i < 100; i++) {
       initial.push(40 + Math.random() * 30);
@@ -18,17 +17,11 @@ export default function ECGTimeline({ score, threshold = 70 }: ECGTimelineProps)
     return initial;
   });
   const animationRef = useRef<number | null>(null);
-  const lastUpdateRef = useRef<number>(0);
 
-  // Add new score to data points
   useEffect(() => {
-    setDataPoints(prev => {
-      const newPoints = [...prev.slice(1), score];
-      return newPoints;
-    });
+    setDataPoints(prev => [...prev.slice(1), score]);
   }, [score]);
 
-  // Smooth animation loop
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -47,21 +40,20 @@ export default function ECGTimeline({ score, threshold = 70 }: ECGTimelineProps)
     const draw = (timestamp: number) => {
       const width = rect.width;
       const height = rect.height;
-      const padding = 20;
+      const padding = 16;
 
-      // Clear canvas
       ctx.clearRect(0, 0, width, height);
 
-      // Background grid
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+      // Subtle grid
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
       ctx.lineWidth = 1;
-      for (let y = 0; y <= height; y += 20) {
+      for (let y = 0; y <= height; y += 24) {
         ctx.beginPath();
         ctx.moveTo(0, y);
         ctx.lineTo(width, y);
         ctx.stroke();
       }
-      for (let x = offset % 40; x <= width; x += 40) {
+      for (let x = offset % 48; x <= width; x += 48) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
         ctx.lineTo(x, height);
@@ -70,26 +62,26 @@ export default function ECGTimeline({ score, threshold = 70 }: ECGTimelineProps)
 
       // Threshold line
       const thresholdY = height - (threshold / 100) * (height - padding * 2) - padding;
-      ctx.strokeStyle = 'rgba(34, 197, 94, 0.3)';
-      ctx.setLineDash([5, 5]);
+      ctx.strokeStyle = 'rgba(74, 222, 128, 0.2)';
+      ctx.setLineDash([4, 4]);
       ctx.beginPath();
       ctx.moveTo(0, thresholdY);
       ctx.lineTo(width, thresholdY);
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Draw ECG line with gradient
+      // ECG line gradient
       const gradient = ctx.createLinearGradient(0, 0, width, 0);
-      gradient.addColorStop(0, 'rgba(99, 102, 241, 0.1)');
-      gradient.addColorStop(0.7, 'rgba(99, 102, 241, 0.8)');
-      gradient.addColorStop(1, 'rgba(34, 197, 94, 1)');
+      gradient.addColorStop(0, 'rgba(129, 140, 248, 0.05)');
+      gradient.addColorStop(0.5, 'rgba(129, 140, 248, 0.4)');
+      gradient.addColorStop(0.85, 'rgba(129, 140, 248, 0.8)');
+      gradient.addColorStop(1, 'rgba(74, 222, 128, 1)');
 
       ctx.strokeStyle = gradient;
-      ctx.lineWidth = 2.5;
+      ctx.lineWidth = 2;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
 
-      // Create smooth curve using bezier
       ctx.beginPath();
       const pointWidth = width / (dataPoints.length - 1);
 
@@ -100,52 +92,40 @@ export default function ECGTimeline({ score, threshold = 70 }: ECGTimelineProps)
         if (i === 0) {
           ctx.moveTo(x, y);
         } else {
-          // Bezier curve for smoothness
           const prevPoint = dataPoints[i - 1];
           const prevY = height - (prevPoint / 100) * (height - padding * 2) - padding;
           const prevX = (i - 1) * pointWidth;
-
           const cpX = (prevX + x) / 2;
           ctx.bezierCurveTo(cpX, prevY, cpX, y, x, y);
         }
       });
       ctx.stroke();
 
-      // Glow effect on the current point
-      const lastX = width;
+      // Glow dot at end
+      const lastX = width - 2;
       const lastY = height - (dataPoints[dataPoints.length - 1] / 100) * (height - padding * 2) - padding;
-
-      // Pulse glow
-      const glowSize = 8 + Math.sin(timestamp / 200) * 3;
-      const glowGradient = ctx.createRadialGradient(lastX, lastY, 0, lastX, lastY, glowSize * 2);
-
       const currentScore = dataPoints[dataPoints.length - 1];
-      const glowColor = currentScore >= 70 ? '34, 197, 94' : currentScore >= 40 ? '245, 158, 11' : '239, 68, 68';
+      const glowColor = currentScore >= 70 ? '74, 222, 128' : currentScore >= 40 ? '251, 191, 36' : '248, 113, 113';
 
-      glowGradient.addColorStop(0, `rgba(${glowColor}, 0.8)`);
-      glowGradient.addColorStop(0.5, `rgba(${glowColor}, 0.3)`);
+      // Outer glow
+      const glowSize = 6 + Math.sin(timestamp / 150) * 2;
+      const glowGradient = ctx.createRadialGradient(lastX, lastY, 0, lastX, lastY, glowSize * 3);
+      glowGradient.addColorStop(0, `rgba(${glowColor}, 0.6)`);
+      glowGradient.addColorStop(0.5, `rgba(${glowColor}, 0.2)`);
       glowGradient.addColorStop(1, `rgba(${glowColor}, 0)`);
 
       ctx.fillStyle = glowGradient;
       ctx.beginPath();
-      ctx.arc(lastX, lastY, glowSize * 2, 0, Math.PI * 2);
+      ctx.arc(lastX, lastY, glowSize * 3, 0, Math.PI * 2);
       ctx.fill();
 
       // Core dot
-      ctx.fillStyle = currentScore >= 70 ? '#22c55e' : currentScore >= 40 ? '#f59e0b' : '#ef4444';
+      ctx.fillStyle = `rgb(${glowColor})`;
       ctx.beginPath();
-      ctx.arc(lastX, lastY, 4, 0, Math.PI * 2);
+      ctx.arc(lastX, lastY, 3, 0, Math.PI * 2);
       ctx.fill();
 
-      // Scanline effect
-      const scanX = (timestamp / 20) % width;
-      const scanGradient = ctx.createLinearGradient(scanX - 100, 0, scanX, 0);
-      scanGradient.addColorStop(0, 'rgba(99, 102, 241, 0)');
-      scanGradient.addColorStop(1, 'rgba(99, 102, 241, 0.1)');
-      ctx.fillStyle = scanGradient;
-      ctx.fillRect(scanX - 100, 0, 100, height);
-
-      offset -= 0.5;
+      offset -= 0.3;
       animationRef.current = requestAnimationFrame(draw);
     };
 
@@ -158,53 +138,53 @@ export default function ECGTimeline({ score, threshold = 70 }: ECGTimelineProps)
     };
   }, [dataPoints, threshold]);
 
-  // Auto-generate data for demo
   useEffect(() => {
     const interval = setInterval(() => {
       setDataPoints(prev => {
         const lastValue = prev[prev.length - 1];
-        // Add some variation based on current score
-        const variation = (Math.random() - 0.5) * 8;
-        const trend = (score - lastValue) * 0.1;
+        const variation = (Math.random() - 0.5) * 6;
+        const trend = (score - lastValue) * 0.08;
         const newValue = Math.max(10, Math.min(100, lastValue + variation + trend));
         return [...prev.slice(1), newValue];
       });
-    }, 100);
+    }, 80);
 
     return () => clearInterval(interval);
   }, [score]);
 
   const currentScore = dataPoints[dataPoints.length - 1];
+  const scoreColor = currentScore >= 70 ? '#4ade80' : currentScore >= 40 ? '#fbbf24' : '#f87171';
 
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-sm font-medium text-white/60">リアルタイムスコア</h3>
-        <div className="flex items-center gap-3">
-          <div className="flex gap-3 text-xs text-white/40">
+        <h3 className="text-sm font-medium text-white/50">リアルタイムスコア</h3>
+        <div className="flex items-center gap-4">
+          <div className="flex gap-3 text-[10px] text-white/30">
             <span className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#22c55e]" />高
+              <span className="w-1.5 h-1.5 rounded-full bg-[#4ade80]" />高
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#f59e0b]" />中
+              <span className="w-1.5 h-1.5 rounded-full bg-[#fbbf24]" />中
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#ef4444]" />低
+              <span className="w-1.5 h-1.5 rounded-full bg-[#f87171]" />低
             </span>
           </div>
-          <span className={`text-lg font-mono font-medium ${
-            currentScore >= 70 ? 'text-[#22c55e]' : currentScore >= 40 ? 'text-[#f59e0b]' : 'text-[#ef4444]'
-          }`}>
+          <span
+            className="text-lg font-mono font-light tabular-nums"
+            style={{ color: scoreColor }}
+          >
             {Math.round(currentScore)}
           </span>
         </div>
       </div>
 
-      <div className="glass rounded-2xl p-1 overflow-hidden">
+      <div className="glass rounded-2xl p-1.5 overflow-hidden">
         <canvas
           ref={canvasRef}
-          className="w-full h-32 rounded-xl"
-          style={{ background: 'rgba(0, 0, 0, 0.3)' }}
+          className="w-full h-28 rounded-xl"
+          style={{ background: 'rgba(0, 0, 0, 0.2)' }}
         />
       </div>
     </div>

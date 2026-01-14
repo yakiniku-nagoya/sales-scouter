@@ -7,29 +7,38 @@ interface TalkGuideProps {
 }
 
 export default function TalkGuide({ currentPhase, suggestions, checkpoints }: TalkGuideProps) {
+  const completedCount = checkpoints.filter(c => c.done).length;
+
   return (
-    <div className="glass rounded-2xl p-5">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-sm font-medium text-white/60">トークガイド</h3>
-        <span className="text-xs text-[#6366f1] bg-[#6366f1]/10 px-2.5 py-1 rounded-full ring-1 ring-[#6366f1]/20">
+    <div className="glass rounded-2xl p-5 h-full">
+      <div className="flex justify-between items-center mb-5">
+        <h3 className="text-sm font-medium text-white/50">トークガイド</h3>
+        <span className="text-[10px] text-[#818cf8] bg-[#818cf8]/10 px-2.5 py-1 rounded-full border border-[#818cf8]/20">
           {currentPhase}
         </span>
       </div>
 
       {/* Checkpoints */}
-      <div className="mb-4">
-        <span className="text-xs text-white/40 mb-2 block">確認ポイント</span>
-        <div className="space-y-1.5">
+      <div className="mb-5">
+        <div className="flex justify-between items-center mb-3">
+          <span className="text-[11px] text-white/30">確認ポイント</span>
+          <span className="text-[10px] text-white/20">{completedCount}/{checkpoints.length}</span>
+        </div>
+        <div className="space-y-2">
           {checkpoints.map((cp, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] ${
+            <div key={i} className="flex items-start gap-2.5">
+              <div className={`w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
                 cp.done
-                  ? 'bg-[#22c55e]/20 text-[#22c55e] ring-1 ring-[#22c55e]/30'
-                  : 'bg-white/5 text-white/30 ring-1 ring-white/10'
+                  ? 'bg-[#4ade80]/15 border border-[#4ade80]/30'
+                  : 'bg-white/[0.02] border border-white/10'
               }`}>
-                {cp.done ? '✓' : ''}
-              </span>
-              <span className={`text-sm ${cp.done ? 'text-white/40 line-through' : 'text-white/70'}`}>
+                {cp.done && (
+                  <svg className="w-2.5 h-2.5 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+              </div>
+              <span className={`text-[12px] leading-relaxed ${cp.done ? 'text-white/30 line-through' : 'text-white/60'}`}>
                 {cp.text}
               </span>
             </div>
@@ -37,16 +46,16 @@ export default function TalkGuide({ currentPhase, suggestions, checkpoints }: Ta
         </div>
       </div>
 
-      {/* Suggested phrases */}
+      {/* Suggestions */}
       <div>
-        <span className="text-xs text-white/40 mb-2 block">おすすめトーク</span>
+        <span className="text-[11px] text-white/30 mb-3 block">おすすめトーク</span>
         <div className="space-y-2">
           {suggestions.map((suggestion, i) => (
             <div
               key={i}
-              className="p-3 rounded-xl bg-[#6366f1]/5 ring-1 ring-[#6366f1]/10 hover:ring-[#6366f1]/30 cursor-pointer transition-all"
+              className="p-3 rounded-xl bg-[#818cf8]/[0.04] border border-[#818cf8]/10 hover:border-[#818cf8]/25 cursor-pointer transition-all duration-200 hover:bg-[#818cf8]/[0.06]"
             >
-              <p className="text-sm text-white/70">「{suggestion}」</p>
+              <p className="text-[12px] text-white/55 leading-relaxed">「{suggestion}」</p>
             </div>
           ))}
         </div>
