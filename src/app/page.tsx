@@ -10,6 +10,7 @@ import AlertOverlay from '@/components/AlertOverlay';
 import EmotionGraph from '@/components/EmotionGraph';
 import NGWordAlert from '@/components/NGWordAlert';
 import TalkGuide from '@/components/TalkGuide';
+import AskAIPanel from '@/components/AskAIPanel';
 
 const highlights = [
   { time: '01:22:15', text: 'それなら今すぐにでも始めたい', type: 'positive' as const, tag: '購買意欲' },
@@ -64,6 +65,7 @@ export default function Home() {
   const [showAlert, setShowAlert] = useState(false);
   const [sessionTime, setSessionTime] = useState(5076);
   const [activeTab, setActiveTab] = useState<'highlight' | 'emotion' | 'ng'>('highlight');
+  const [showAskAI, setShowAskAI] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -110,6 +112,7 @@ export default function Home() {
 
       <div className="relative z-10 min-h-screen">
         <AlertOverlay isActive={showAlert} onClose={() => setShowAlert(false)} />
+        <AskAIPanel isOpen={showAskAI} onToggle={() => setShowAskAI(!showAskAI)} />
 
         <div className="max-w-7xl mx-auto px-8 py-6">
           {/* Header */}

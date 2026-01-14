@@ -12,8 +12,9 @@ export default function ScoreGauge({ score }: ScoreGaugeProps) {
   };
 
   const colors = getScoreColor();
-  const circumference = 2 * Math.PI * 56;
-  const strokeDashoffset = circumference - (score / 100) * circumference * 0.75;
+  const radius = 56;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference - (score / 100) * circumference;
 
   return (
     <div className="flex flex-col items-center py-4">
@@ -25,17 +26,15 @@ export default function ScoreGauge({ score }: ScoreGaugeProps) {
         />
 
         {/* SVG Gauge */}
-        <svg className="w-full h-full -rotate-[135deg]" viewBox="0 0 120 120">
+        <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
           {/* Background track */}
           <circle
             cx="60"
             cy="60"
-            r="56"
+            r={radius}
             fill="none"
             stroke="rgba(255,255,255,0.04)"
             strokeWidth="4"
-            strokeLinecap="round"
-            strokeDasharray={circumference * 0.75}
           />
           {/* Gradient definition */}
           <defs>
@@ -48,12 +47,12 @@ export default function ScoreGauge({ score }: ScoreGaugeProps) {
           <circle
             cx="60"
             cy="60"
-            r="56"
+            r={radius}
             fill="none"
             stroke="url(#scoreGradient)"
             strokeWidth="4"
             strokeLinecap="round"
-            strokeDasharray={circumference * 0.75}
+            strokeDasharray={circumference}
             strokeDashoffset={strokeDashoffset}
             className="transition-all duration-700 ease-out"
             style={{ filter: `drop-shadow(0 0 6px ${colors.glow})` }}
