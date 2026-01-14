@@ -74,6 +74,13 @@ export default function Home() {
     return () => clearInterval(timer);
   }, []);
 
+  // スコア100で即座にエフェクト発動
+  useEffect(() => {
+    if (score >= 100) {
+      setShowAlert(true);
+    }
+  }, [score]);
+
   const formatTime = (seconds: number) => {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
@@ -90,12 +97,11 @@ export default function Home() {
   };
 
   const startSimulation = () => {
-    const simScores = [45, 52, 58, 65, 72, 78, 85, 82, 88, 92];
+    const simScores = [45, 52, 58, 65, 72, 78, 85, 88, 92, 96, 100];
     let i = 0;
     const interval = setInterval(() => {
       if (i >= simScores.length) {
         clearInterval(interval);
-        triggerAlert();
         return;
       }
       updateScore(simScores[i]);

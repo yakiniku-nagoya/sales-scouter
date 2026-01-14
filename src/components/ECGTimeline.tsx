@@ -10,17 +10,26 @@ interface ECGTimelineProps {
 export default function ECGTimeline({ score, threshold = 70 }: ECGTimelineProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [dataPoints, setDataPoints] = useState<number[]>(() => {
+    // 初期値は固定（ハイドレーション対策）
+    return Array(100).fill(50);
+  });
+  const [isClient, setIsClient] = useState(false);
+  const animationRef = useRef<number | null>(null);
+
+  // クライアントサイドでのみランダム初期化
+  useEffect(() => {
+    setIsClient(true);
     const initial: number[] = [];
     for (let i = 0; i < 100; i++) {
       initial.push(40 + Math.random() * 30);
     }
-    return initial;
-  });
-  const animationRef = useRef<number | null>(null);
+    setDataPoints(initial);
+  }, []);
 
   useEffect(() => {
+    if (!isClient) return;
     setDataPoints(prev => [...prev.slice(1), score]);
-  }, [score]);
+  }, [score, isClient]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
